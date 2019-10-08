@@ -1,34 +1,18 @@
-"""Platform for light integration."""
-import logging
-
-import voluptuous as vol
-
-import homeassistant.helpers.config_validation as cv
-# Import the device class from the component that you want to support
+"""Bond Home Light Integration"""
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS, PLATFORM_SCHEMA, Light)
-from homeassistant.const import CONF_HOST, CONF_TOKEN
+import logging
+DOMAIN = 'bond'
+
+# Import the device class from the component that you want to support
 
 _LOGGER = logging.getLogger(__name__)
-
-# Validation of the user's configuration
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_HOST): cv.string,
-    vol.Required(CONF_TOKEN): cv.string,
-})
 
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Light platform."""
-    from bond import Bond
-
-    # Assign configuration variables.
-    # The configuration check takes care they are present.
-    host = config[CONF_HOST]
-    token = config[CONF_TOKEN]
-
     # Setup connection with devices/cloud
-    bond = Bond(bondIp=host, bondToken=token)
+    bond = hass.data[DOMAIN]['bond_hub']
 
     # Verify that passed in configuration works
     # if not hub.is_valid_login():
@@ -49,7 +33,7 @@ class BondLight(Light):
 
         bondProperties = self._bond.getDevice(self._deviceId)
 
-        self._name = bondProperties['name']
+        self._name = bondProperties['name'] + ' Light'
         self._state = None
         # self._brightness = None
 
