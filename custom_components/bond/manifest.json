@@ -1,4 +1,5 @@
 {
+  "homeassistant": "0.99.3",
   "domain": "bond",
   "name": "Bond Home",
   "documentation": "https://github.com/home-assistant/example-custom-config/tree/master/custom_components/example_light/",
