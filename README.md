@@ -9,10 +9,9 @@ Copy the contents of the `bond` directory from this repo into a directory at `<Y
 Add the following to your `configuration.yml`:
 
 ```yaml
-light:
-  - platform: bond
-    host: YOUR_BOND_HUB_IP
-    token: YOUR_BOND_TOKEN
+bond:
+  host: YOUR_BOND_HUB_IP
+  token: YOUR_BOND_TOKEN
 ```
 
 For details on how to get the Bond Hub's IP address, please see http://docs-local.appbond.com/#section/Getting-Started/Finding-the-Bond-IP
