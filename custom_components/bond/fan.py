@@ -3,6 +3,10 @@ from homeassistant.components.fan import (FanEntity)
 import logging
 DOMAIN = 'bond'
 
+from .bond import (
+    BOND_DEVICE_TYPE_CEILING_FAN,
+)
+
 # Import the device class from the component that you want to support
 
 _LOGGER = logging.getLogger(__name__)
@@ -14,7 +18,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     bond = hass.data[DOMAIN]['bond_hub']
 
     # Add devices
-    add_entities(BondFan(bond, deviceId) for deviceId in bond.getDeviceIds())
+    for deviceId in bond.getDeviceIds():
+        if bond.getDeviceType(deviceId) == BOND_DEVICE_TYPE_CEILING_FAN:
+            add_entities( [ BondFan(bond, deviceId) ] )
 
 
 class BondFan(FanEntity):

@@ -4,6 +4,11 @@ from homeassistant.components.light import (
 import logging
 DOMAIN = 'bond'
 
+from .bond import (
+    BOND_DEVICE_TYPE_CEILING_FAN,
+)
+
+
 # Import the device class from the component that you want to support
 
 _LOGGER = logging.getLogger(__name__)
@@ -20,8 +25,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     #     return
 
     # Add devices
-    add_entities(BondLight(bond, deviceId) for deviceId in bond.getDeviceIds())
-
+    for deviceId in bond.getDeviceIds():
+        if bond.getDeviceType(deviceId) == BOND_DEVICE_TYPE_CEILING_FAN:
+            add_entities( [ BondLight(bond, deviceId) ] )
 
 class BondLight(Light):
     """Representation of an Bond Light."""

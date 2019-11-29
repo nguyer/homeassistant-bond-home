@@ -19,7 +19,7 @@ CONFIG_SCHEMA = vol.Schema({
 def setup(hass, config):
     """Your controller/hub specific code."""
 
-    from bond import Bond
+    from .bond import Bond
 
     # Assign configuration variables.
     # The configuration check takes care they are present.
