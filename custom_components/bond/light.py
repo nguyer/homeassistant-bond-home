@@ -29,10 +29,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     # Add devices
     for deviceId in bond.getDeviceIds():
-        if bond.getDeviceType(deviceId) == BOND_DEVICE_TYPE_CEILING_FAN:
-            newBondLight = BondLight(bond, deviceId)
-            if newBondLight is not None:
-                add_entities( [ newBondLight ] )
+        newBondLight = BondLight(bond, deviceId)
+        if newBondLight is not None:
+            add_entities( [ newBondLight ] )
 
 class BondLight(Light):
     """Representation of an Bond Light."""
@@ -42,13 +41,15 @@ class BondLight(Light):
         self._bond = bond
         self._deviceId = deviceId
         self._properties = self._bond.getDevice(self._deviceId)
+        self._name = self._properties['name'] + ' Light'
+        self._state = None
 
-        if BOND_DEVICE_ACTION_TURNLIGHTON in self._properties['actions'] or BOND_DEVICE_ACTION_TURNLIGHTOFF in self._properties['actions'] or BOND_DEVICE_ACTION_TOGGLELIGHT in self._properties['actions']:
-            self._name = self._properties['name'] + ' Light'
-            self._state = None
-            # self._brightness = None
-        else:
-            # If Bond device does not support on/off or toggle, it's probably not a light 
+        # If the device type is not Ceiling Fan, or it is Ceiling Fan but has no action for light control
+        # then don't create a light instance
+        if self._properties['type'] != BOND_DEVICE_TYPE_CEILING_FAN or \
+             ( BOND_DEVICE_ACTION_TURNLIGHTON not in self._properties['actions'] and \
+               BOND_DEVICE_ACTION_TURNLIGHTOFF not in self._properties['actions'] and \
+               BOND_DEVICE_ACTION_TOGGLELIGHT not in self._properties['actions'] ):
             self = None
 
     @property

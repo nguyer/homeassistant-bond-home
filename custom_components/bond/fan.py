@@ -32,8 +32,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     # Add devices
     for deviceId in bond.getDeviceIds():
-        if bond.getDeviceType(deviceId) == BOND_DEVICE_TYPE_CEILING_FAN:
-            add_entities( [ BondFan(bond, deviceId) ] )
+        newBondFan = BondFan(bond, deviceId)
+        if newBondFan is not None:
+            add_entities( [ newBondFan ] )
 
 class BondFan(FanEntity):
     """Representation of an Bond Fan"""
@@ -44,22 +45,25 @@ class BondFan(FanEntity):
         self._deviceId = deviceId
         self._device = self._bond.getDevice(self._deviceId)
         self._properties = self._bond.getProperties(self._deviceId)
-        self._speed_list = []
-
-        if BOND_DEVICE_ACTION_SETSPEED in self._device['actions']:
-            if 'max_speed' in self._properties:
-                self._speed_high = int(self._properties['max_speed'])
-                self._speed_low = int(1)
-                self._speed_list.append(SPEED_LOW)
-                if self._speed_high > 2:
-                    self._speed_list.append(SPEED_MEDIUM)
-                    self._speed_medium = (self._speed_high + 1) // 2
-                    self._speed_list.append(SPEED_MEDIUM)
-                self._speed_list.append(SPEED_HIGH)
-                
         self._name = self._device['name']
         self._state = None
+        self._speed_list = []
 
+        if self._device['type'] == BOND_DEVICE_TYPE_CEILING_FAN:
+            if BOND_DEVICE_ACTION_SETSPEED in self._device['actions']:
+                if 'max_speed' in self._properties:
+                    self._speed_high = int(self._properties['max_speed'])
+                    self._speed_low = int(1)
+                    self._speed_list.append(SPEED_LOW)
+                    if self._speed_high > 2:
+                        self._speed_list.append(SPEED_MEDIUM)
+                        self._speed_medium = (self._speed_high + 1) // 2
+                        self._speed_list.append(SPEED_MEDIUM)
+                    self._speed_list.append(SPEED_HIGH)
+        else:
+            # If not Ceiling Fan type, do not instatiate object
+            self = None
+            
     @property
     def name(self):
         """Return the display name of this fan"""

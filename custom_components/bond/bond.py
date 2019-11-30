@@ -35,26 +35,23 @@ class Bond:
         self.bondIp = bondIp
         self.bondToken = bondToken
 
-    def setFanSpeed(self, deviceId, speed):
-        return self.doAction(deviceId, 'SetSpeed', {'argument': speed})
-
     def turnFanOn(self, deviceId):
-        return self.doAction(deviceId, 'TurnOn')
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_TURNON)
 
     def turnFanOff(self, deviceId):
-        return self.doAction(deviceId, 'TurnOff')
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_TURNOFF)
 
     def setFanSpeed(self, deviceId, speed):
         return self.doAction(deviceId, BOND_DEVICE_ACTION_SETSPEED, {"argument":speed} )
 
     def toggleLight(self, deviceId):
-        return self.doAction(deviceId, 'ToggleLight')
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_TOGGLELIGHT)
 
     def turnLightOn(self, deviceId):
-        return self.doAction(deviceId, 'TurnLightOn')
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_TURNLIGHTON)
 
     def turnLightOff(self, deviceId):
-        return self.doAction(deviceId, 'TurnLightOff')
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_TURNLIGHTOFF)
 
     def doAction(self, deviceId, action, payload={}):
         r = requests.put(
@@ -72,18 +69,13 @@ class Bond:
                 devices.append(key)
         return devices
 
-    def getDeviceType(self, deviceId):
+    def getDevice(self, deviceId):
         r = requests.get(f'http://{self.bondIp}/v2/devices/{deviceId}',
-                         headers={'BOND-Token': self.bondToken})
-        return r.json()['type']
-
-    def getProperties(self, deviceId):
-        r = requests.get(f'http://{self.bondIp}/v2/devices/{deviceId}/properties/',
                          headers={'BOND-Token': self.bondToken})
         return r.json()
 
-    def getDevice(self, deviceId):
-        r = requests.get(f'http://{self.bondIp}/v2/devices/{deviceId}',
+    def getProperties(self, deviceId):
+        r = requests.get(f'http://{self.bondIp}/v2/devices/{deviceId}/properties/',
                          headers={'BOND-Token': self.bondToken})
         return r.json()
 
