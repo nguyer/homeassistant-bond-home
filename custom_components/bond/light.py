@@ -1,11 +1,14 @@
 """Bond Home Light Integration"""
 from homeassistant.components.light import (
-    ATTR_BRIGHTNESS, PLATFORM_SCHEMA, Light)
+    ATTR_BRIGHTNESS,PLATFORM_SCHEMA,Light)
 import logging
 DOMAIN = 'bond'
 
 from .bond import (
     BOND_DEVICE_TYPE_CEILING_FAN,
+    BOND_DEVICE_ACTION_TURNLIGHTON,
+    BOND_DEVICE_ACTION_TURNLIGHTOFF,
+    BOND_DEVICE_ACTION_TOGGLELIGHT,
 )
 
 
@@ -27,7 +30,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     # Add devices
     for deviceId in bond.getDeviceIds():
         if bond.getDeviceType(deviceId) == BOND_DEVICE_TYPE_CEILING_FAN:
-            add_entities( [ BondLight(bond, deviceId) ] )
+            newBondLight = BondLight(bond, deviceId)
+            if newBondLight is not None:
+                add_entities( [ newBondLight ] )
 
 class BondLight(Light):
     """Representation of an Bond Light."""
@@ -36,12 +41,15 @@ class BondLight(Light):
         """Initialize a Bond Light."""
         self._bond = bond
         self._deviceId = deviceId
+        self._properties = self._bond.getDevice(self._deviceId)
 
-        bondProperties = self._bond.getDevice(self._deviceId)
-
-        self._name = bondProperties['name'] + ' Light'
-        self._state = None
-        # self._brightness = None
+        if BOND_DEVICE_ACTION_TURNLIGHTON in self._properties['actions'] or BOND_DEVICE_ACTION_TURNLIGHTOFF in self._properties['actions'] or BOND_DEVICE_ACTION_TOGGLELIGHT in self._properties['actions']:
+            self._name = self._properties['name'] + ' Light'
+            self._state = None
+            # self._brightness = None
+        else:
+            # If Bond device does not support on/off or toggle, it's probably not a light 
+            self = None
 
     @property
     def name(self):
