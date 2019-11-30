@@ -53,6 +53,15 @@ class Bond:
     def turnLightOff(self, deviceId):
         return self.doAction(deviceId, BOND_DEVICE_ACTION_TURNLIGHTOFF)
 
+    def openShade(self, deviceId):
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_OPEN)
+
+    def closeShade(self, deviceId):
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_CLOSE)
+
+    def holdShade(self, deviceId):
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_HOLD)
+
     def doAction(self, deviceId, action, payload={}):
         r = requests.put(
             f'http://{self.bondIp}/v2/devices/{deviceId}/actions/{action}', headers={'BOND-Token': self.bondToken}, json=payload)
