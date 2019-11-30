@@ -109,5 +109,5 @@ class BondFan(FanEntity):
         This is the only method that should fetch new data for Home Assistant
         """
         bondState = self._bond.getDeviceState(self._deviceId)
-        # if 'power' in bondState:
-        self._state = True if bondState['power'] == 1 else False
+        if 'power' in bondState:
+            self._state = True if bondState['power'] == 1 else False
