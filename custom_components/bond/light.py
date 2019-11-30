@@ -30,7 +30,13 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     # Add devices
     for deviceId in bond.getDeviceIds():
         newBondLight = BondLight(bond, deviceId)
-        if newBondLight is not None:
+
+        # If the device type is not Ceiling Fan, or it is Ceiling Fan but has no action for light control
+        # then don't create a light instance
+        if newBondLight._properties['type'] == BOND_DEVICE_TYPE_CEILING_FAN and \
+              ( BOND_DEVICE_ACTION_TURNLIGHTON in newBondLight._properties['actions'] or \
+                BOND_DEVICE_ACTION_TURNLIGHTOFF in newBondLight._properties['actions'] or \
+                BOND_DEVICE_ACTION_TOGGLELIGHT in newBondLight._properties['actions'] ):
             add_entities( [ newBondLight ] )
 
 class BondLight(Light):
@@ -43,14 +49,6 @@ class BondLight(Light):
         self._properties = self._bond.getDevice(self._deviceId)
         self._name = self._properties['name'] + ' Light'
         self._state = None
-
-        # If the device type is not Ceiling Fan, or it is Ceiling Fan but has no action for light control
-        # then don't create a light instance
-        if self._properties['type'] != BOND_DEVICE_TYPE_CEILING_FAN or \
-             ( BOND_DEVICE_ACTION_TURNLIGHTON not in self._properties['actions'] and \
-               BOND_DEVICE_ACTION_TURNLIGHTOFF not in self._properties['actions'] and \
-               BOND_DEVICE_ACTION_TOGGLELIGHT not in self._properties['actions'] ):
-            self = None
 
     @property
     def name(self):
@@ -89,5 +87,6 @@ class BondLight(Light):
         This is the only method that should fetch new data for Home Assistant.
         """
         bondState = self._bond.getDeviceState(self._deviceId)
-        self._state = True if bondState['light'] == 1 else False
+        if 'light' in bondState:
+            self._state = True if bondState['light'] == 1 else False
         # self._brightness = self._light.brightness

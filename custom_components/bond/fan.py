@@ -33,7 +33,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     # Add devices
     for deviceId in bond.getDeviceIds():
         newBondFan = BondFan(bond, deviceId)
-        if newBondFan is not None:
+
+        # If not Ceiling Fan type, do not instatiate object
+        if newBondFan._device['type'] == BOND_DEVICE_TYPE_CEILING_FAN:
             add_entities( [ newBondFan ] )
 
 class BondFan(FanEntity):
@@ -49,20 +51,16 @@ class BondFan(FanEntity):
         self._state = None
         self._speed_list = []
 
-        if self._device['type'] == BOND_DEVICE_TYPE_CEILING_FAN:
-            if BOND_DEVICE_ACTION_SETSPEED in self._device['actions']:
-                if 'max_speed' in self._properties:
-                    self._speed_high = int(self._properties['max_speed'])
-                    self._speed_low = int(1)
-                    self._speed_list.append(SPEED_LOW)
-                    if self._speed_high > 2:
-                        self._speed_list.append(SPEED_MEDIUM)
-                        self._speed_medium = (self._speed_high + 1) // 2
-                        self._speed_list.append(SPEED_MEDIUM)
-                    self._speed_list.append(SPEED_HIGH)
-        else:
-            # If not Ceiling Fan type, do not instatiate object
-            self = None
+        if BOND_DEVICE_ACTION_SETSPEED in self._device['actions']:
+            if 'max_speed' in self._properties:
+                self._speed_high = int(self._properties['max_speed'])
+                self._speed_low = int(1)
+                self._speed_list.append(SPEED_LOW)
+                if self._speed_high > 2:
+                    self._speed_list.append(SPEED_MEDIUM)
+                    self._speed_medium = (self._speed_high + 1) // 2
+                    self._speed_list.append(SPEED_MEDIUM)
+                self._speed_list.append(SPEED_HIGH)
             
     @property
     def name(self):
@@ -111,4 +109,5 @@ class BondFan(FanEntity):
         This is the only method that should fetch new data for Home Assistant
         """
         bondState = self._bond.getDeviceState(self._deviceId)
+        # if 'power' in bondState:
         self._state = True if bondState['power'] == 1 else False
