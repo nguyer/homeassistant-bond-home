@@ -89,11 +89,11 @@ class BondFan(FanEntity):
 
     def turn_on(self, speed=None, **kwargs):
         """Instruct the fan to turn on"""
-        self._bond.turnFanOn(self._deviceId)
+        self._bond.turnOn(self._deviceId)
 
     def turn_off(self, **kwargs):
         """Instruct the fan to turn off"""
-        self._bond.turnFanOff(self._deviceId)
+        self._bond.turnOff(self._deviceId)
 
     def set_speed(self, speed: str) -> None:
         """Set the speed of the fan."""

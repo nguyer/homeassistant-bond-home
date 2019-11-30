@@ -35,11 +35,14 @@ class Bond:
         self.bondIp = bondIp
         self.bondToken = bondToken
 
-    def turnFanOn(self, deviceId):
+    def turnOn(self, deviceId):
         return self.doAction(deviceId, BOND_DEVICE_ACTION_TURNON)
 
-    def turnFanOff(self, deviceId):
+    def turnOff(self, deviceId):
         return self.doAction(deviceId, BOND_DEVICE_ACTION_TURNOFF)
+
+    def togglePower(self, deviceId):
+        return self.doAction(deviceId, BOND_DEVICE_ACTION_TOGGLEPOWER)
 
     def setFanSpeed(self, deviceId, speed):
         return self.doAction(deviceId, BOND_DEVICE_ACTION_SETSPEED, {"argument":speed} )

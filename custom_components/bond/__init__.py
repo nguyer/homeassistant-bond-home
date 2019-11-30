@@ -38,5 +38,6 @@ def setup(hass, config):
     hass.helpers.discovery.load_platform('light', DOMAIN, {}, config)
     hass.helpers.discovery.load_platform('fan', DOMAIN, {}, config)
     hass.helpers.discovery.load_platform('cover', DOMAIN, {}, config)
+    hass.helpers.discovery.load_platform('switch', DOMAIN, {}, config)
 
     return True
