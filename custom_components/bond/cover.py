@@ -15,7 +15,7 @@ from homeassistant.components.cover import (
 import logging
 DOMAIN = 'bond'
 
-from .bond import (
+from bond import (
     BOND_DEVICE_TYPE_MOTORIZED_SHADES,
     BOND_DEVICE_ACTION_OPEN,
     BOND_DEVICE_ACTION_CLOSE,

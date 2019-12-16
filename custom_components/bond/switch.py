@@ -9,7 +9,7 @@ from homeassistant.components.switch import (
 import logging
 DOMAIN = 'bond'
 
-from .bond import (
+from bond import (
     BOND_DEVICE_TYPE_GENERIC_DEVICE,
     BOND_DEVICE_ACTION_TURNON,
     BOND_DEVICE_ACTION_TURNOFF,

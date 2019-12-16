@@ -4,7 +4,7 @@ from homeassistant.components.light import (
 import logging
 DOMAIN = 'bond'
 
-from .bond import (
+from bond import (
     BOND_DEVICE_TYPE_CEILING_FAN,
     BOND_DEVICE_ACTION_TURNLIGHTON,
     BOND_DEVICE_ACTION_TURNLIGHTOFF,

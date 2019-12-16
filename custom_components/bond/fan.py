@@ -9,7 +9,7 @@ from homeassistant.components.fan import (
 import logging
 DOMAIN = 'bond'
 
-from .bond import (
+from bond import (
     BOND_DEVICE_TYPE_CEILING_FAN,
     BOND_DEVICE_ACTION_SETSPEED,
     BOND_DEVICE_ACTION_INCREASESPEED,
