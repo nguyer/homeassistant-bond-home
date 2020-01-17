@@ -1,8 +1,16 @@
 """Bond Home Light Integration"""
 from homeassistant.components.light import (
-    ATTR_BRIGHTNESS, PLATFORM_SCHEMA, Light)
+    ATTR_BRIGHTNESS,PLATFORM_SCHEMA,Light)
 import logging
 DOMAIN = 'bond'
+
+from bond import (
+    BOND_DEVICE_TYPE_CEILING_FAN,
+    BOND_DEVICE_ACTION_TURNLIGHTON,
+    BOND_DEVICE_ACTION_TURNLIGHTOFF,
+    BOND_DEVICE_ACTION_TOGGLELIGHT,
+)
+
 
 # Import the device class from the component that you want to support
 
@@ -20,8 +28,16 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     #     return
 
     # Add devices
-    add_entities(BondLight(bond, deviceId) for deviceId in bond.getDeviceIds())
+    for deviceId in bond.getDeviceIds():
+        newBondLight = BondLight(bond, deviceId)
 
+        # If the device type is not Ceiling Fan, or it is Ceiling Fan but has no action for light control
+        # then don't create a light instance
+        if newBondLight._properties['type'] == BOND_DEVICE_TYPE_CEILING_FAN and \
+              ( BOND_DEVICE_ACTION_TURNLIGHTON in newBondLight._properties['actions'] or \
+                BOND_DEVICE_ACTION_TURNLIGHTOFF in newBondLight._properties['actions'] or \
+                BOND_DEVICE_ACTION_TOGGLELIGHT in newBondLight._properties['actions'] ):
+            add_entities( [ newBondLight ] )
 
 class BondLight(Light):
     """Representation of an Bond Light."""
@@ -30,12 +46,9 @@ class BondLight(Light):
         """Initialize a Bond Light."""
         self._bond = bond
         self._deviceId = deviceId
-
-        bondProperties = self._bond.getDevice(self._deviceId)
-
-        self._name = bondProperties['name'] + ' Light'
+        self._properties = self._bond.getDevice(self._deviceId)
+        self._name = self._properties['name'] + ' Light'
         self._state = None
-        # self._brightness = None
 
     @property
     def name(self):
@@ -74,5 +87,6 @@ class BondLight(Light):
         This is the only method that should fetch new data for Home Assistant.
         """
         bondState = self._bond.getDeviceState(self._deviceId)
-        self._state = True if bondState['light'] == 1 else False
+        if 'light' in bondState:
+            self._state = True if bondState['light'] == 1 else False
         # self._brightness = self._light.brightness
