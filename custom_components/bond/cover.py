@@ -37,7 +37,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     for deviceId in bond.getDeviceIds():
         newBondCover = BondCover(bond, deviceId)
 
-        # If not Motorized Shaed device, do not instatiate object
+        # If not Motorized Shade device, do not instantiate object
         if newBondCover._device['type'] == BOND_DEVICE_TYPE_MOTORIZED_SHADES:
             add_entities( [ newBondCover ] )
 

@@ -35,7 +35,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
             add_entities( [ newBondSwitch ] )
 
 class BondSwitch(SwitchDevice):
-    """Representation of an Bond Generic Device."""
+    """Representation of a Bond Generic Device."""
 
     def __init__(self, bond, deviceId):
         """Initialize a Bond Generic Device."""

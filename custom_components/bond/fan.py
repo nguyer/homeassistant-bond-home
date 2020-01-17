@@ -57,7 +57,6 @@ class BondFan(FanEntity):
                 self._speed_low = int(1)
                 self._speed_list.append(SPEED_LOW)
                 if self._speed_high > 2:
-                    self._speed_list.append(SPEED_MEDIUM)
                     self._speed_medium = (self._speed_high + 1) // 2
                     self._speed_list.append(SPEED_MEDIUM)
                 self._speed_list.append(SPEED_HIGH)
