@@ -123,11 +123,6 @@ class BondLight(Light):
         """Return the ID of this light."""
         return self.unique_id
 
-    @property
-    def device_state_attributes(self):
-        """Get the state attributes for the device."""
-        return self._properties
-
 
 class BondFireplace(Light):
     """Representation of an Bond Fireplace."""
@@ -181,14 +176,16 @@ class BondFireplace(Light):
         You can skip the brightness part if your light does not support
         brightness control.
         """
+        self._bond.turnOn(self._deviceId)
+
         if self._supportsFlameAction:
             # Convert Home Assistant flame level (0-255) to bond level (0-100)
             brightness = kwargs.get(ATTR_BRIGHTNESS, self._last_flame)
             flame = int((brightness * 100) / 255)
+
+            # NOTE: We may need to call set flame down and set flame up.
             self._bond.setFlame(self._deviceId, flame)
             self._flame = flame
-        else:
-            self._bond.turnOn(self._deviceId)
 
     def turn_off(self, **kwargs):
         """Instruct the fireplace to turn off."""
@@ -219,6 +216,6 @@ class BondFireplace(Light):
         return self.unique_id
 
     @property
-    def device_state_attributes(self):
-        """Get the state attributes for the device."""
-        return self._properties
+    def icon(self):
+        """Get the icon to use in the front end."""
+        return "mdi:fireplace" if self._state is True else "mdi:fireplace-off"

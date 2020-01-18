@@ -82,8 +82,3 @@ class BondSwitch(SwitchDevice):
     def device_id(self):
         """Return the ID of this switch."""
         return self.unique_id
-
-    @property
-    def device_state_attributes(self):
-        """Get the state attributes for the device."""
-        return self._properties
