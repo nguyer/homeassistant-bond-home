@@ -9,7 +9,7 @@ from homeassistant.components.cover import (
     SUPPORT_STOP,
     STATE_CLOSED,
     STATE_OPEN,
-    CoverDevice,
+    CoverDevice
 )
 
 from bond import (
@@ -45,7 +45,11 @@ class BondCover(CoverDevice):
         self._deviceId = deviceId
         self._device = device
         self._properties = properties
-        self._name = f"{properties['location']} {properties['name']}"
+        name = "Cover" if "name" not in properties else properties['name']
+        if "location" in properties:
+            self._name = f"{properties['location']} {name}"
+        else:
+            self._name = name
         self._state = None
 
     @property

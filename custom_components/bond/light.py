@@ -2,7 +2,7 @@
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     PLATFORM_SCHEMA,
-    SUPPORT_BRIGHTNESS
+    SUPPORT_BRIGHTNESS,
     Light
 )
 
@@ -80,7 +80,11 @@ class BondLight(Light):
         self._deviceId = deviceId
         self._device = device
         self._properties = properties
-        self._name = f"{properties['location']} {properties['name']}"
+        name = "Light" if "name" not in properties else properties['name']
+        if "location" in properties:
+            self._name = f"{properties['location']} {name}"
+        else:
+            self._name = name
         self._state = None
 
     @property
@@ -119,7 +123,11 @@ class BondFireplace(Light):
         self._deviceId = deviceId
         self._device = device
         self._properties = properties
-        self._name = f"{properties['location']} {properties['name']}"
+        name = "Fireplace" if "name" not in properties else properties['name']
+        if "location" in properties:
+            self._name = f"{properties['location']} {name}"
+        else:
+            self._name = name
         self._supportsFlameAction = supportsFlame
         self._state = None
         self._flame = None

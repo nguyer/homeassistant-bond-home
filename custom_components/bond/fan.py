@@ -41,7 +41,11 @@ class BondFan(FanEntity):
         self._deviceId = deviceId
         self._device = device
         self._properties = properties
-        self._name = f"{properties['location']} {properties['name']}"
+        name = "Fan" if "name" not in properties else properties['name']
+        if "location" in properties:
+            self._name = f"{properties['location']} {name}"
+        else:
+            self._name = name
         self._state = None
         self._speed_list = []
 
