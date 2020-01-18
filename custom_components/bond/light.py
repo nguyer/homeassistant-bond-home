@@ -113,6 +113,21 @@ class BondLight(Light):
         if 'light' in bondState:
             self._state = True if bondState['light'] == 1 else False
 
+    @property
+    def unique_id(self):
+        """Get the unique identifier of the device."""
+        return self._deviceId
+
+    @property
+    def device_id(self):
+        """Return the ID of this Hue light."""
+        return self.unique_id
+
+    @property
+    def device_state_attributes(self):
+        """Get the state attributes for the device."""
+        return self._properties
+
 
 class BondFireplace(Light):
     """Representation of an Bond Fireplace."""
@@ -129,8 +144,9 @@ class BondFireplace(Light):
         else:
             self._name = name
         self._supportsFlameAction = supportsFlame
-        self._state = None
+        self._last_flame = 255
         self._flame = None
+        self._state = None
 
     @property
     def name(self):
@@ -165,9 +181,10 @@ class BondFireplace(Light):
         You can skip the brightness part if your light does not support
         brightness control.
         """
-
-        if ATTR_BRIGHTNESS in kwargs:
-            flame = int(kwargs[ATTR_BRIGHTNESS])
+        if self._supportsFlameAction:
+            # Convert Home Assistant flame level (0-255) to bond level (0-100)
+            brightness = kwargs.get(ATTR_BRIGHTNESS, self._last_flame)
+            flame = int((brightness * 100) / 255)
             self._bond.setFlame(self._deviceId, flame)
             self._flame = flame
         else:
@@ -176,6 +193,8 @@ class BondFireplace(Light):
     def turn_off(self, **kwargs):
         """Instruct the fireplace to turn off."""
         self._bond.turnOff(self._deviceId)
+        if self._flame:
+            self._last_flame = self._flame
 
     def update(self):
         """Fetch new state data for this light.
@@ -185,5 +204,21 @@ class BondFireplace(Light):
         if 'power' in bondState:
             self._state = True if bondState['power'] == 1 else False
 
+        # Convert bond level (0-100) to Home Assistant flame level (0-255)
         if 'flame' in bondState:
-            self._flame = int(bondState['flame'])
+            self._flame = int((bondState['flame'] * 255) / 100)
+
+    @property
+    def unique_id(self):
+        """Get the unique identifier of the device."""
+        return self._deviceId
+
+    @property
+    def device_id(self):
+        """Return the ID of this Hue light."""
+        return self.unique_id
+
+    @property
+    def device_state_attributes(self):
+        """Get the state attributes for the device."""
+        return self._properties
