@@ -53,7 +53,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 add_entities([light])
 
         elif deviceType == BOND_DEVICE_TYPE_FIREPLACE:
-            supportsFlameAction = \
+            supportsFlameActions = \
                 BOND_DEVICE_ACTION_SET_FLAME in actions or \
                 BOND_DEVICE_ACTION_INCREASE_FLAME in actions or \
                 BOND_DEVICE_ACTION_DECREASE_FLAME in actions
@@ -69,7 +69,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                                       deviceId,
                                       device,
                                       deviceProperties,
-                                      supportsFlameAction)
+                                      supportsFlameActions)
             add_entities([fireplace])
 
 
