@@ -11,19 +11,16 @@ DOMAIN = 'bond'
 
 from bond import (
     BOND_DEVICE_TYPE_CEILING_FAN,
-    BOND_DEVICE_ACTION_SETSPEED,
-    BOND_DEVICE_ACTION_INCREASESPEED,
-    BOND_DEVICE_ACTION_DECREASESPEED,
-    BOND_DEVICE_ACTION_TURNON,
-    BOND_DEVICE_ACTION_TURNOFF,
-    BOND_DEVICE_ACTION_TOGGLEPOWER,
-
+    BOND_DEVICE_ACTION_SET_SPEED,
+    BOND_DEVICE_ACTION_INCREASE_SPEED,
+    BOND_DEVICE_ACTION_DECREASE_SPEED,
+    BOND_DEVICE_ACTION_TURN_ON,
+    BOND_DEVICE_ACTION_TURN_OFF,
+    BOND_DEVICE_ACTION_TOGGLE_POWER,
 )
 
 # Import the device class from the component that you want to support
-
 _LOGGER = logging.getLogger(__name__)
-
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Fan platform"""
@@ -47,11 +44,11 @@ class BondFan(FanEntity):
         self._deviceId = deviceId
         self._device = self._bond.getDevice(self._deviceId)
         self._properties = self._bond.getProperties(self._deviceId)
-        self._name = self._device['name']
+        self._name = self._properties['location'] + " " + self._properties['name']
         self._state = None
         self._speed_list = []
 
-        if BOND_DEVICE_ACTION_SETSPEED in self._device['actions']:
+        if BOND_DEVICE_ACTION_SET_SPEED in self._device['actions']:
             if 'max_speed' in self._properties:
                 self._speed_high = int(self._properties['max_speed'])
                 self._speed_low = int(1)
@@ -60,7 +57,7 @@ class BondFan(FanEntity):
                     self._speed_medium = (self._speed_high + 1) // 2
                     self._speed_list.append(SPEED_MEDIUM)
                 self._speed_list.append(SPEED_HIGH)
-            
+
     @property
     def name(self):
         """Return the display name of this fan"""
@@ -81,7 +78,7 @@ class BondFan(FanEntity):
         """Flag supported features."""
         supported_features = 0
 
-        if BOND_DEVICE_ACTION_SETSPEED in self._device['actions']:
+        if BOND_DEVICE_ACTION_SET_SPEED in self._device['actions']:
             supported_features |= SUPPORT_SET_SPEED
 
         return supported_features
@@ -97,11 +94,11 @@ class BondFan(FanEntity):
     def set_speed(self, speed: str) -> None:
         """Set the speed of the fan."""
         if speed == SPEED_HIGH:
-           self._bond.setFanSpeed(self._deviceId, self._speed_high)
+           self._bond.setSpeed(self._deviceId, self._speed_high)
         elif speed == SPEED_MEDIUM:
-           self._bond.setFanSpeed(self._deviceId, self._speed_medium)
+           self._bond.setSpeed(self._deviceId, self._speed_medium)
         elif speed == SPEED_LOW:
-           self._bond.setFanSpeed(self._deviceId, self._speed_low)
+           self._bond.setSpeed(self._deviceId, self._speed_low)
 
     def update(self):
         """Fetch new state data for this fan

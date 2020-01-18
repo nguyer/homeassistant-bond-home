@@ -22,11 +22,10 @@ from bond import (
     BOND_DEVICE_ACTION_HOLD,
     BOND_DEVICE_ACTION_PAIR,
     BOND_DEVICE_ACTION_PRESET,
-    BOND_DEVICE_ACTION_TOGGLEOPEN,
+    BOND_DEVICE_ACTION_TOGGLE_OPEN,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Fan platform"""
@@ -50,7 +49,7 @@ class BondCover(CoverDevice):
         self._deviceId = deviceId
         self._device = self._bond.getDevice(self._deviceId)
         self._properties = self._bond.getProperties(self._deviceId)
-        self._name = self._device['name']
+        self._name = self._properties['location'] + " " + self._properties['name']
         self._state = None
 
     @property
@@ -79,14 +78,14 @@ class BondCover(CoverDevice):
 
     def open_cover(self, **kwargs):
         """Instruct the cover to open."""
-        self._bond.openShade(self._deviceId)
+        self._bond.open(self._deviceId)
 
     def close_cover(self, **kwargs):
         """Instruct the cover to close."""
-        self._bond.closeShade(self._deviceId)
+        self._bond.close(self._deviceId)
 
     def stop_cover(self, **kwargs):
         """Instruct the cover to stop."""
-        self._bond.holdShade(self._deviceId)
+        self._bond.hold(self._deviceId)
 
 

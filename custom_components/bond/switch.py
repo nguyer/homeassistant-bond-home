@@ -11,15 +11,13 @@ DOMAIN = 'bond'
 
 from bond import (
     BOND_DEVICE_TYPE_GENERIC_DEVICE,
-    BOND_DEVICE_ACTION_TURNON,
-    BOND_DEVICE_ACTION_TURNOFF,
-    BOND_DEVICE_ACTION_TOGGLEPOWER,
+    BOND_DEVICE_ACTION_TURN_ON,
+    BOND_DEVICE_ACTION_TURN_OFF,
+    BOND_DEVICE_ACTION_TOGGLE_POWER
 )
 
 # Import the device class from the component that you want to support
-
 _LOGGER = logging.getLogger(__name__)
-
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Generic Device platform."""
@@ -42,7 +40,7 @@ class BondSwitch(SwitchDevice):
         self._bond = bond
         self._deviceId = deviceId
         self._properties = self._bond.getDevice(self._deviceId)
-        self._name = self._properties['name']
+        self._name = self._properties['location'] + " " + self._properties['name']
         self._state = None
 
     @property
