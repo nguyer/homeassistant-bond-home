@@ -40,23 +40,21 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         if deviceType == BOND_DEVICE_TYPE_CEILING_FAN
             # If the device type is not Ceiling Fan, or it is Ceiling Fan but has no action for light control
             # then don't create a light instance
-            actions = deviceProperties['actions']
-            deviceSupportsLightActions = BOND_DEVICE_ACTION_TURN_LIGHT_ON in actions or \
-                                         BOND_DEVICE_ACTION_TURN_LIGHT_OFF in actions or \
-                                         BOND_DEVICE_ACTION_TOGGLE_LIGHT in actions
+            deviceSupportsLightActions = BOND_DEVICE_ACTION_TURN_LIGHT_ON in deviceActions or \
+                                         BOND_DEVICE_ACTION_TURN_LIGHT_OFF in deviceActions or \
+                                         BOND_DEVICE_ACTION_TOGGLE_LIGHT in deviceActions
             if deviceSupportsLightActions
                 newBondLight = BondLight(bond, deviceId, deviceProperties)
                 add_entities([ newBondLight ])
 
         elif deviceType == BOND_DEVICE_TYPE_FIREPLACE
-            actions = deviceProperties['actions']
-            deviceSupportsFlameActions = BOND_DEVICE_ACTION_SET_FLAME in actions or \
-                                         BOND_DEVICE_ACTION_INCREASE_FLAME in actions or \
-                                         BOND_DEVICE_ACTION_DECREASE_FLAME in actions
+            deviceSupportsFlameActions = BOND_DEVICE_ACTION_SET_FLAME in deviceActions or \
+                                         BOND_DEVICE_ACTION_INCREASE_FLAME in deviceActions or \
+                                         BOND_DEVICE_ACTION_DECREASE_FLAME in deviceActions
 
-            deviceSupportsGenericActions = BOND_DEVICE_ACTION_TURN_ON in actions or \
-                BOND_DEVICE_ACTION_TURN_OFF in actions or \
-                BOND_DEVICE_ACTION_TOGGLE_POWER in actions
+            deviceSupportsGenericActions = BOND_DEVICE_ACTION_TURN_ON in deviceActions or \
+                BOND_DEVICE_ACTION_TURN_OFF in deviceActions or \
+                BOND_DEVICE_ACTION_TOGGLE_POWER in deviceActions
 
             if deviceSupportsGenericActions
                 newBondFireplace = BondFireplace(bond, deviceId, deviceProperties, deviceSupportsFlameActions)
