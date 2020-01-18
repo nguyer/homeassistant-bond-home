@@ -6,41 +6,41 @@ from homeassistant.components.switch import (
     SERVICE_TOGGLE,
     SwitchDevice,
 )
+
+from bond import (
+    BOND_DEVICE_TYPE_GENERIC_DEVICE
+)
+
 import logging
 DOMAIN = 'bond'
 
-from bond import (
-    BOND_DEVICE_TYPE_GENERIC_DEVICE,
-    BOND_DEVICE_ACTION_TURN_ON,
-    BOND_DEVICE_ACTION_TURN_OFF,
-    BOND_DEVICE_ACTION_TOGGLE_POWER
-)
-
-# Import the device class from the component that you want to support
 _LOGGER = logging.getLogger(__name__)
+
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Generic Device platform."""
-    # Setup connection with devices/cloud
     bond = hass.data[DOMAIN]['bond_hub']
 
-    # Add devices
     for deviceId in bond.getDeviceIds():
-        newBondSwitch = BondSwitch(bond, deviceId)
+        device = self._bond.getDevice(deviceId)
+        if device['type'] != BOND_DEVICE_TYPE_GENERIC_DEVICE:
+            continue
 
-        # If the device type is not a Generic Device, then don't create a switch instance
-        if newBondSwitch._properties['type'] == BOND_DEVICE_TYPE_GENERIC_DEVICE:
-            add_entities( [ newBondSwitch ] )
+        deviceProperties = self._bond.getProperties(deviceId)
+        switch = BondSwitch(bond, deviceId, device, deviceProperties)
+        add_entities([switch])
+
 
 class BondSwitch(SwitchDevice):
     """Representation of a Bond Generic Device."""
 
-    def __init__(self, bond, deviceId):
+    def __init__(self, bond, deviceId, device, properties):
         """Initialize a Bond Generic Device."""
         self._bond = bond
         self._deviceId = deviceId
-        self._properties = self._bond.getDevice(self._deviceId)
-        self._name = self._properties['location'] + " " + self._properties['name']
+        self._device = device
+        self._properties = properties
+        self._name = f"{properties['location']} {properties['name']}"
         self._state = None
 
     @property

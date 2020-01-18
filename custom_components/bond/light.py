@@ -6,9 +6,6 @@ from homeassistant.components.light import (
     Light
 )
 
-import logging
-DOMAIN = 'bond'
-
 from bond import (
     BOND_DEVICE_TYPE_CEILING_FAN,
     BOND_DEVICE_TYPE_FIREPLACE,
@@ -23,8 +20,13 @@ from bond import (
     BOND_DEVICE_ACTION_DECREASE_FLAME
 )
 
+import logging
+DOMAIN = 'bond'
+
+
 # Import the device class from the component that you want to support
 _LOGGER = logging.getLogger(__name__)
+
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Light platform."""
@@ -33,42 +35,54 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     # Add devices
     for deviceId in bond.getDeviceIds():
-        deviceProperties = self._bond.getDevice(deviceId)
-        deviceType = deviceProperties['type'];
-        deviceActions = deviceProperties['actions']
+        device = self._bond.getDevice(deviceId)
+        deviceType = device['type']
+        actions = device['actions']
 
-        if deviceType == BOND_DEVICE_TYPE_CEILING_FAN
-            # If the device type is not Ceiling Fan, or it is Ceiling Fan but has no action for light control
-            # then don't create a light instance
-            deviceSupportsLightActions = BOND_DEVICE_ACTION_TURN_LIGHT_ON in deviceActions or \
-                                         BOND_DEVICE_ACTION_TURN_LIGHT_OFF in deviceActions or \
-                                         BOND_DEVICE_ACTION_TOGGLE_LIGHT in deviceActions
-            if deviceSupportsLightActions
-                newBondLight = BondLight(bond, deviceId, deviceProperties)
-                add_entities([ newBondLight ])
+        if deviceType == BOND_DEVICE_TYPE_CEILING_FAN:
+            # If the device type is not Ceiling Fan, or it is
+            # Ceiling Fan but has no action for light control
+            # then don't create a light instance.
+            supportsLightActions = \
+                BOND_DEVICE_ACTION_TURN_LIGHT_ON in actions or \
+                BOND_DEVICE_ACTION_TURN_LIGHT_OFF in actions or \
+                BOND_DEVICE_ACTION_TOGGLE_LIGHT in actions
+            if supportsLightActions:
+                deviceProperties = self._bond.getProperties(deviceId)
+                light = BondLight(bond, deviceId, device, deviceProperties)
+                add_entities([light])
 
-        elif deviceType == BOND_DEVICE_TYPE_FIREPLACE
-            deviceSupportsFlameActions = BOND_DEVICE_ACTION_SET_FLAME in deviceActions or \
-                                         BOND_DEVICE_ACTION_INCREASE_FLAME in deviceActions or \
-                                         BOND_DEVICE_ACTION_DECREASE_FLAME in deviceActions
+        elif deviceType == BOND_DEVICE_TYPE_FIREPLACE:
+            supportsFlameAction = \
+                BOND_DEVICE_ACTION_SET_FLAME in actions or \
+                BOND_DEVICE_ACTION_INCREASE_FLAME in actions or \
+                BOND_DEVICE_ACTION_DECREASE_FLAME in actions
 
-            deviceSupportsGenericActions = BOND_DEVICE_ACTION_TURN_ON in deviceActions or \
-                BOND_DEVICE_ACTION_TURN_OFF in deviceActions or \
-                BOND_DEVICE_ACTION_TOGGLE_POWER in deviceActions
+            supportsGenericActions = \
+                BOND_DEVICE_ACTION_TURN_ON in actions or \
+                BOND_DEVICE_ACTION_TURN_OFF in actions or \
+                BOND_DEVICE_ACTION_TOGGLE_POWER in actions
 
-            if deviceSupportsGenericActions
-                newBondFireplace = BondFireplace(bond, deviceId, deviceProperties, deviceSupportsFlameActions)
-                add_entities([ newBondFireplace ])
+        if supportsGenericActions:
+            deviceProperties = self._bond.getProperties(deviceId)
+            fireplace = BondFireplace(bond,
+                                      deviceId,
+                                      device,
+                                      deviceProperties,
+                                      supportsFlameAction)
+            add_entities([fireplace])
+
 
 class BondLight(Light):
     """Representation of an Bond Light."""
 
-    def __init__(self, bond, deviceId, properties):
+    def __init__(self, bond, deviceId, device, properties):
         """Initialize a Bond Light."""
         self._bond = bond
         self._deviceId = deviceId
+        self._device = device
         self._properties = properties
-        self._name = self._properties['location'] + " " + self._properties['name']
+        self._name = f"{properties['location']} {properties['name']}"
         self._state = None
 
     @property
@@ -76,27 +90,13 @@ class BondLight(Light):
         """Return the display name of this light."""
         return self._name
 
-    # @property
-    # def brightness(self):
-    #     """Return the brightness of the light.
-
-    #     This method is optional. Removing it indicates to Home Assistant
-    #     that brightness is not supported for this light.
-    #     """
-    #     return self._brightness
-
     @property
     def is_on(self):
         """Return true if light is on."""
         return self._state
 
     def turn_on(self, **kwargs):
-        """Instruct the light to turn on.
-
-        You can skip the brightness part if your light does not support
-        brightness control.
-        """
-        #self._light.brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
+        """Instruct the light to turn on."""
         self._bond.turnLightOn(self._deviceId)
 
     def turn_off(self, **kwargs):
@@ -110,18 +110,19 @@ class BondLight(Light):
         bondState = self._bond.getDeviceState(self._deviceId)
         if 'light' in bondState:
             self._state = True if bondState['light'] == 1 else False
-        # self._brightness = self._light.brightness
+
 
 class BondFireplace(Light):
     """Representation of an Bond Fireplace."""
 
-    def __init__(self, bond, deviceId, properties, supportsFlameFeature):
+    def __init__(self, bond, deviceId, device, properties, supportsFlame):
         """Initialize a Bond Fireplace."""
         self._bond = bond
         self._deviceId = deviceId
+        self._device = device
         self._properties = properties
-        self._name = self._properties['location'] + " " + self._properties['name']
-        self._supportsFlameFeature = supportsFlameFeature
+        self._name = f"{properties['location']} {properties['name']}"
+        self._supportsFlameAction = supportsFlame
         self._state = None
         self._flame = None
 
@@ -136,7 +137,7 @@ class BondFireplace(Light):
         This method is optional. Removing it indicates to Home Assistant
         that brightness is not supported for this light.
         """
-        return SUPPORT_BRIGHTNESS if self._supportsFlameFeature else 0
+        return SUPPORT_BRIGHTNESS if self._supportsFlameAction else 0
 
     @property
     def brightness(self):
@@ -160,10 +161,11 @@ class BondFireplace(Light):
         """
 
         if ATTR_BRIGHTNESS in kwargs:
-            self._flame = int(kwargs[ATTR_BRIGHTNESS])
-            self._bond.setFlame(self._deviceId, self._flame)
+            flame = int(kwargs[ATTR_BRIGHTNESS])
+            self._bond.setFlame(self._deviceId, flame)
+            self._flame = flame
         else
-            self._bond.turnOn(self._deviceId)
+        self._bond.turnOn(self._deviceId)
 
     def turn_off(self, **kwargs):
         """Instruct the fireplace to turn off."""

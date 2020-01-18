@@ -6,45 +6,42 @@ from homeassistant.components.fan import (
     SPEED_HIGH,
     FanEntity
 )
-import logging
-DOMAIN = 'bond'
 
 from bond import (
     BOND_DEVICE_TYPE_CEILING_FAN,
-    BOND_DEVICE_ACTION_SET_SPEED,
-    BOND_DEVICE_ACTION_INCREASE_SPEED,
-    BOND_DEVICE_ACTION_DECREASE_SPEED,
-    BOND_DEVICE_ACTION_TURN_ON,
-    BOND_DEVICE_ACTION_TURN_OFF,
-    BOND_DEVICE_ACTION_TOGGLE_POWER,
+    BOND_DEVICE_ACTION_SET_SPEED
 )
 
-# Import the device class from the component that you want to support
+import logging
+DOMAIN = 'bond'
+
 _LOGGER = logging.getLogger(__name__)
+
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Fan platform"""
-    # Setup connection with devices/cloud
     bond = hass.data[DOMAIN]['bond_hub']
 
-    # Add devices
     for deviceId in bond.getDeviceIds():
-        newBondFan = BondFan(bond, deviceId)
+        device = self._bond.getDevice(deviceId)
+        if device['type'] != BOND_DEVICE_TYPE_CEILING_FAN:
+            continue
 
-        # If not Ceiling Fan type, do not instatiate object
-        if newBondFan._device['type'] == BOND_DEVICE_TYPE_CEILING_FAN:
-            add_entities( [ newBondFan ] )
+        deviceProperties = self._bond.getProperties(deviceId)
+        fan = BondFan(bond, deviceId, device, deviceProperties)
+        add_entities([fan])
+
 
 class BondFan(FanEntity):
     """Representation of an Bond Fan"""
 
-    def __init__(self, bond, deviceId):
+    def __init__(self, bond, deviceId, device, properties):
         """Initialize a Bond Fan"""
         self._bond = bond
         self._deviceId = deviceId
-        self._device = self._bond.getDevice(self._deviceId)
-        self._properties = self._bond.getProperties(self._deviceId)
-        self._name = self._properties['location'] + " " + self._properties['name']
+        self._device = device
+        self._properties = properties
+        self._name = f"{properties['location']} {properties['name']}"
         self._state = None
         self._speed_list = []
 
@@ -94,11 +91,11 @@ class BondFan(FanEntity):
     def set_speed(self, speed: str) -> None:
         """Set the speed of the fan."""
         if speed == SPEED_HIGH:
-           self._bond.setSpeed(self._deviceId, self._speed_high)
+            self._bond.setSpeed(self._deviceId, self._speed_high)
         elif speed == SPEED_MEDIUM:
-           self._bond.setSpeed(self._deviceId, self._speed_medium)
+            self._bond.setSpeed(self._deviceId, self._speed_medium)
         elif speed == SPEED_LOW:
-           self._bond.setSpeed(self._deviceId, self._speed_low)
+            self._bond.setSpeed(self._deviceId, self._speed_low)
 
     def update(self):
         """Fetch new state data for this fan
