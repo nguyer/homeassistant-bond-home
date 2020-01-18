@@ -23,8 +23,6 @@ from bond import (
 import logging
 DOMAIN = 'bond'
 
-
-# Import the device class from the component that you want to support
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -63,14 +61,14 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 BOND_DEVICE_ACTION_TURN_OFF in actions or \
                 BOND_DEVICE_ACTION_TOGGLE_POWER in actions
 
-        if supportsGenericActions:
-            deviceProperties = self._bond.getProperties(deviceId)
-            fireplace = BondFireplace(bond,
-                                      deviceId,
-                                      device,
-                                      deviceProperties,
-                                      supportsFlameActions)
-            add_entities([fireplace])
+            if supportsGenericActions:
+                deviceProperties = self._bond.getProperties(deviceId)
+                fireplace = BondFireplace(bond,
+                                          deviceId,
+                                          device,
+                                          deviceProperties,
+                                          supportsFlameActions)
+                add_entities([fireplace])
 
 
 class BondLight(Light):
@@ -164,8 +162,8 @@ class BondFireplace(Light):
             flame = int(kwargs[ATTR_BRIGHTNESS])
             self._bond.setFlame(self._deviceId, flame)
             self._flame = flame
-        else
-        self._bond.turnOn(self._deviceId)
+        else:
+            self._bond.turnOn(self._deviceId)
 
     def turn_off(self, **kwargs):
         """Instruct the fireplace to turn off."""
