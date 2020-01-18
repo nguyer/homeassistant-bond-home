@@ -72,3 +72,18 @@ class BondSwitch(SwitchDevice):
         bondState = self._bond.getDeviceState(self._deviceId)
         if 'power' in bondState:
             self._state = True if bondState['power'] == 1 else False
+
+    @property
+    def unique_id(self):
+        """Get the unique identifier of the device."""
+        return self._deviceId
+
+    @property
+    def device_id(self):
+        """Return the ID of this switch."""
+        return self.unique_id
+
+    @property
+    def device_state_attributes(self):
+        """Get the state attributes for the device."""
+        return self._properties

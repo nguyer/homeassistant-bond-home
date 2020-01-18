@@ -87,3 +87,18 @@ class BondCover(CoverDevice):
     def stop_cover(self, **kwargs):
         """Instruct the cover to stop."""
         self._bond.hold(self._deviceId)
+
+    @property
+    def unique_id(self):
+        """Get the unique identifier of the device."""
+        return self._deviceId
+
+    @property
+    def device_id(self):
+        """Return the ID of this cover."""
+        return self.unique_id
+
+    @property
+    def device_state_attributes(self):
+        """Get the state attributes for the device."""
+        return self._properties
