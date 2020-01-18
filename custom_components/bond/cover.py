@@ -27,11 +27,11 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     bond = hass.data[DOMAIN]['bond_hub']
 
     for deviceId in bond.getDeviceIds():
-        device = self._bond.getDevice(deviceId)
+        device = bond.getDevice(deviceId)
         if device['type'] != BOND_DEVICE_TYPE_MOTORIZED_SHADES:
             continue
 
-        deviceProperties = self._bond.getProperties(deviceId)
+        deviceProperties = bond.getProperties(deviceId)
         cover = BondCover(bond, deviceId, device, deviceProperties)
         add_entities([cover])
 

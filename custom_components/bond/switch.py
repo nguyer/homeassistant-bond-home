@@ -22,11 +22,11 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     bond = hass.data[DOMAIN]['bond_hub']
 
     for deviceId in bond.getDeviceIds():
-        device = self._bond.getDevice(deviceId)
+        device = bond.getDevice(deviceId)
         if device['type'] != BOND_DEVICE_TYPE_GENERIC_DEVICE:
             continue
 
-        deviceProperties = self._bond.getProperties(deviceId)
+        deviceProperties = bond.getProperties(deviceId)
         switch = BondSwitch(bond, deviceId, device, deviceProperties)
         add_entities([switch])
 

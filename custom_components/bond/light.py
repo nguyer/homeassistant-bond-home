@@ -33,7 +33,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     # Add devices
     for deviceId in bond.getDeviceIds():
-        device = self._bond.getDevice(deviceId)
+        device = bond.getDevice(deviceId)
         deviceType = device['type']
         actions = device['actions']
 
@@ -46,7 +46,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 BOND_DEVICE_ACTION_TURN_LIGHT_OFF in actions or \
                 BOND_DEVICE_ACTION_TOGGLE_LIGHT in actions
             if supportsLightActions:
-                deviceProperties = self._bond.getProperties(deviceId)
+                deviceProperties = bond.getProperties(deviceId)
                 light = BondLight(bond, deviceId, device, deviceProperties)
                 add_entities([light])
 
@@ -62,7 +62,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 BOND_DEVICE_ACTION_TOGGLE_POWER in actions
 
             if supportsGenericActions:
-                deviceProperties = self._bond.getProperties(deviceId)
+                deviceProperties = bond.getProperties(deviceId)
                 fireplace = BondFireplace(bond,
                                           deviceId,
                                           device,
