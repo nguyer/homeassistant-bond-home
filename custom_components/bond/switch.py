@@ -4,45 +4,47 @@ from homeassistant.components.switch import (
     SERVICE_TURN_ON,
     SERVICE_TURN_OFF,
     SERVICE_TOGGLE,
-    SwitchDevice,
+    SwitchDevice
 )
-import logging
-DOMAIN = 'bond'
 
 from bond import (
-    BOND_DEVICE_TYPE_GENERIC_DEVICE,
-    BOND_DEVICE_ACTION_TURNON,
-    BOND_DEVICE_ACTION_TURNOFF,
-    BOND_DEVICE_ACTION_TOGGLEPOWER,
+    BOND_DEVICE_TYPE_GENERIC_DEVICE
 )
 
-# Import the device class from the component that you want to support
+import logging
+DOMAIN = 'bond'
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Generic Device platform."""
-    # Setup connection with devices/cloud
     bond = hass.data[DOMAIN]['bond_hub']
 
-    # Add devices
     for deviceId in bond.getDeviceIds():
-        newBondSwitch = BondSwitch(bond, deviceId)
+        device = bond.getDevice(deviceId)
+        if device['type'] != BOND_DEVICE_TYPE_GENERIC_DEVICE:
+            continue
 
-        # If the device type is not a Generic Device, then don't create a switch instance
-        if newBondSwitch._properties['type'] == BOND_DEVICE_TYPE_GENERIC_DEVICE:
-            add_entities( [ newBondSwitch ] )
+        deviceProperties = bond.getProperties(deviceId)
+        switch = BondSwitch(bond, deviceId, device, deviceProperties)
+        add_entities([switch])
+
 
 class BondSwitch(SwitchDevice):
     """Representation of a Bond Generic Device."""
 
-    def __init__(self, bond, deviceId):
+    def __init__(self, bond, deviceId, device, properties):
         """Initialize a Bond Generic Device."""
         self._bond = bond
         self._deviceId = deviceId
-        self._properties = self._bond.getDevice(self._deviceId)
-        self._name = self._properties['name']
+        self._device = device
+        self._properties = properties
+        name = "Switch" if "name" not in properties else properties['name']
+        if "location" in properties:
+            self._name = f"{properties['location']} {name}"
+        else:
+            self._name = name
         self._state = None
 
     @property
@@ -70,3 +72,13 @@ class BondSwitch(SwitchDevice):
         bondState = self._bond.getDeviceState(self._deviceId)
         if 'power' in bondState:
             self._state = True if bondState['power'] == 1 else False
+
+    @property
+    def unique_id(self):
+        """Get the unique identifier of the device."""
+        return self._deviceId
+
+    @property
+    def device_id(self):
+        """Return the ID of this switch."""
+        return self.unique_id

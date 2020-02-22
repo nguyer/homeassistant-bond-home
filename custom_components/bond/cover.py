@@ -9,53 +9,52 @@ from homeassistant.components.cover import (
     SUPPORT_STOP,
     STATE_CLOSED,
     STATE_OPEN,
-    CoverDevice,
+    CoverDevice
+)
+
+from bond import (
+    BOND_DEVICE_TYPE_MOTORIZED_SHADES
 )
 
 import logging
 DOMAIN = 'bond'
-
-from bond import (
-    BOND_DEVICE_TYPE_MOTORIZED_SHADES,
-    BOND_DEVICE_ACTION_OPEN,
-    BOND_DEVICE_ACTION_CLOSE,
-    BOND_DEVICE_ACTION_HOLD,
-    BOND_DEVICE_ACTION_PAIR,
-    BOND_DEVICE_ACTION_PRESET,
-    BOND_DEVICE_ACTION_TOGGLEOPEN,
-)
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Fan platform"""
-    # Setup connection with devices/cloud
     bond = hass.data[DOMAIN]['bond_hub']
 
-    # Add devices
     for deviceId in bond.getDeviceIds():
-        newBondCover = BondCover(bond, deviceId)
+        device = bond.getDevice(deviceId)
+        if device['type'] != BOND_DEVICE_TYPE_MOTORIZED_SHADES:
+            continue
 
-        # If not Motorized Shade device, do not instantiate object
-        if newBondCover._device['type'] == BOND_DEVICE_TYPE_MOTORIZED_SHADES:
-            add_entities( [ newBondCover ] )
+        deviceProperties = bond.getProperties(deviceId)
+        cover = BondCover(bond, deviceId, device, deviceProperties)
+        add_entities([cover])
+
 
 class BondCover(CoverDevice):
-    """Representation of an Bond Shade"""
+    """Representation of an Bond Cover"""
 
-    def __init__(self, bond, deviceId):
-        """Initialize a Bond Fan"""
+    def __init__(self, bond, deviceId, device, properties):
+        """Initialize a Bond Cover"""
         self._bond = bond
         self._deviceId = deviceId
-        self._device = self._bond.getDevice(self._deviceId)
-        self._properties = self._bond.getProperties(self._deviceId)
-        self._name = self._device['name']
+        self._device = device
+        self._properties = properties
+        name = "Cover" if "name" not in properties else properties['name']
+        if "location" in properties:
+            self._name = f"{properties['location']} {name}"
+        else:
+            self._name = name
         self._state = None
 
     @property
     def name(self):
-        """Return the display name of this fan"""
+        """Return the display name of this cover"""
         return self._name
 
     @property
@@ -79,14 +78,22 @@ class BondCover(CoverDevice):
 
     def open_cover(self, **kwargs):
         """Instruct the cover to open."""
-        self._bond.openShade(self._deviceId)
+        self._bond.open(self._deviceId)
 
     def close_cover(self, **kwargs):
         """Instruct the cover to close."""
-        self._bond.closeShade(self._deviceId)
+        self._bond.close(self._deviceId)
 
     def stop_cover(self, **kwargs):
         """Instruct the cover to stop."""
-        self._bond.holdShade(self._deviceId)
+        self._bond.hold(self._deviceId)
 
+    @property
+    def unique_id(self):
+        """Get the unique identifier of the device."""
+        return self._deviceId
 
+    @property
+    def device_id(self):
+        """Return the ID of this cover."""
+        return self.unique_id
