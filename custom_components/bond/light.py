@@ -80,11 +80,7 @@ class BondLight(Light):
         self._deviceId = deviceId
         self._device = device
         self._properties = properties
-        name = "Light" if "name" not in properties else properties['name']
-        if "location" in properties:
-            self._name = f"{properties['location']} {name}"
-        else:
-            self._name = name
+        self._name = device['name']
         self._state = None
 
     @property
