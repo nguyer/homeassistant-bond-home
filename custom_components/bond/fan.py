@@ -109,7 +109,7 @@ class BondFan(FanEntity):
         bondState = self._bond.getDeviceState(self._deviceId)
         if 'power' in bondState:
             self._state = True if bondState['power'] == 1 else False
-            self._attributes['speed'] = [speed_name for speed_name, speed_value in self._speed_map if bondState['speed'] == speed_value][0]
+            self._attributes['speed'] = [speed_name for speed_name, speed_value in self._speed_map.items() if bondState['speed'] == speed_value][0]
 
     @property
     def unique_id(self):
