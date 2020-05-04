@@ -41,8 +41,13 @@ class BondFan(FanEntity):
         self._deviceId = deviceId
         self._device = device
         self._properties = properties
-        self._name = device['name']
+        name = "Fan" if "name" not in properties else properties['name']
+        if "location" in properties:
+            self._name = f"{properties['location']} {name}"
+        else:
+            self._name = name
         self._state = None
+        self._attributes = {}
         self._speed_list = []
 
         if BOND_DEVICE_ACTION_SET_SPEED in self._device['actions']:
@@ -79,7 +84,12 @@ class BondFan(FanEntity):
             supported_features |= SUPPORT_SET_SPEED
 
         return supported_features
-
+    
+    @property
+    def device_state_attributes(self):
+        """Return state attributes """
+        return self._attributes
+    
     def turn_on(self, speed=None, **kwargs):
         """Instruct the fan to turn on"""
         self._bond.turnOn(self._deviceId)
@@ -104,6 +114,7 @@ class BondFan(FanEntity):
         bondState = self._bond.getDeviceState(self._deviceId)
         if 'power' in bondState:
             self._state = True if bondState['power'] == 1 else False
+            self._attributes['speed'] = bondState['speed'] if bondState['power'] == 1 else 0
 
     @property
     def unique_id(self):
