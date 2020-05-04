@@ -48,17 +48,17 @@ class BondFan(FanEntity):
             self._name = name
         self._state = None
         self._attributes = {}
-        self._speed_list = []
+        self._speed_map = {}
 
         if BOND_DEVICE_ACTION_SET_SPEED in self._device['actions']:
             if 'max_speed' in self._properties:
                 self._speed_high = int(self._properties['max_speed'])
                 self._speed_low = int(1)
-                self._speed_list.append(SPEED_LOW)
+                self._speed_map[SPEED_LOW] = self._speed_low
                 if self._speed_high > 2:
                     self._speed_medium = (self._speed_high + 1) // 2
-                    self._speed_list.append(SPEED_MEDIUM)
-                self._speed_list.append(SPEED_HIGH)
+                    self._speed_map[SPEED_MEDIUM] = self._speed_medium
+                self._speed_map[SPEED_HIGH] = self._speed_high
 
     @property
     def name(self):
@@ -73,7 +73,7 @@ class BondFan(FanEntity):
     @property
     def speed_list(self) -> list:
         """Get the list of available speeds."""
-        return self._speed_list
+        return self._speed_map.keys()
 
     @property
     def supported_features(self):
@@ -100,12 +100,7 @@ class BondFan(FanEntity):
 
     def set_speed(self, speed: str) -> None:
         """Set the speed of the fan."""
-        if speed == SPEED_HIGH:
-            self._bond.setSpeed(self._deviceId, self._speed_high)
-        elif speed == SPEED_MEDIUM:
-            self._bond.setSpeed(self._deviceId, self._speed_medium)
-        elif speed == SPEED_LOW:
-            self._bond.setSpeed(self._deviceId, self._speed_low)
+        self._bond.setSpeed(self._deviceId, self._speed_map[speed])
 
     def update(self):
         """Fetch new state data for this fan
@@ -114,7 +109,7 @@ class BondFan(FanEntity):
         bondState = self._bond.getDeviceState(self._deviceId)
         if 'power' in bondState:
             self._state = True if bondState['power'] == 1 else False
-            self._attributes['speed'] = bondState['speed'] if bondState['power'] == 1 else 0
+            self._attributes['speed'] = [speed_name for speed_name, speed_value in self._speed_map if bondState['speed'] == speed_value][0]
 
     @property
     def unique_id(self):
