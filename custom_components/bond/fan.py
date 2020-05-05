@@ -102,13 +102,13 @@ class BondFan(FanEntity):
 
     def set_speed(self, speed: str) -> None:
         """Set the speed of the fan."""
-        self._attributes['current_speed'] = speed
         if speed == SPEED_HIGH:
             self._bond.setSpeed(self._deviceId, self._speed_high)
         elif speed == SPEED_MEDIUM:
             self._bond.setSpeed(self._deviceId, self._speed_medium)
         elif speed == SPEED_LOW:
             self._bond.setSpeed(self._deviceId, self._speed_low)
+        self._attributes['current_speed'] = speed
 
     def update(self):
         """Fetch new state data for this fan
