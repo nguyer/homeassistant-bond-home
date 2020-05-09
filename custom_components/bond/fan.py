@@ -77,7 +77,12 @@ class BondFan(FanEntity):
     @property
     def device_state_attributes(self):
         """Return state attributes """
-        return self._attributes
+        """For now, the only attribute being tracked is 'current speed'.
+        Since this is accessible via the 'speed' property, there is no
+        need to return any attributes at this time.
+        """
+        # return self._attributes
+        return None
 
     @property
     def supported_features(self):
@@ -109,6 +114,11 @@ class BondFan(FanEntity):
         elif speed == SPEED_LOW:
             self._bond.setSpeed(self._deviceId, self._speed_low)
         self._attributes["current_speed"] = speed
+
+    @property
+    def speed(self) -> str:
+        """Return the current speed."""
+        return self._attributes.get("current_speed")
 
     def update(self):
         """Fetch new state data for this fan
