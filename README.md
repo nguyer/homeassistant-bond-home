@@ -18,4 +18,4 @@ For details on how to get the Bond Hub's IP address, please see http://docs-loca
 
 For details on getting a token, please see http://docs-local.appbond.com/#section/Getting-Started/Getting-the-Bond-Token
 
-> **Note**: This is still in the very early stages of development, and so far only turning lights on and off is the only thing that actually works. More to come very soon! PRs welcome :)
+> **Note**: This is still in the very early stages of development, and so far only turning lights and fans are the only things that actually work. More to come very soon! PRs welcome :)
