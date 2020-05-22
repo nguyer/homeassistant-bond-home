@@ -3,7 +3,7 @@ from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     PLATFORM_SCHEMA,
     SUPPORT_BRIGHTNESS,
-    Light
+    LightEntity
 )
 
 from bond import (
@@ -71,7 +71,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 add_entities([fireplace])
 
 
-class BondLight(Light):
+class BondLight(LightEntity):
     """Representation of an Bond Light."""
 
     def __init__(self, bond, deviceId, device, properties):
@@ -120,7 +120,7 @@ class BondLight(Light):
         return self.unique_id
 
 
-class BondFireplace(Light):
+class BondFireplace(LightEntity):
     """Representation of an Bond Fireplace."""
 
     def __init__(self, bond, deviceId, device, properties, supportsFlame):
