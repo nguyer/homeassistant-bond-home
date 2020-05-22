@@ -36,7 +36,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         add_entities([cover])
 
 
-class BondCover(CoverDevice):
+class BondCover(CoverEntity):
     """Representation of an Bond Cover"""
 
     def __init__(self, bond, deviceId, device, properties):
