@@ -71,7 +71,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
                 add_entities([fireplace])
 
 
-class BondLight(Light):
+class BondLight(LightEntity):
     """Representation of an Bond Light."""
 
     def __init__(self, bond, deviceId, device, properties):
