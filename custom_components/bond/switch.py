@@ -4,7 +4,7 @@ from homeassistant.components.switch import (
     SERVICE_TURN_ON,
     SERVICE_TURN_OFF,
     SERVICE_TOGGLE,
-    SwitchDevice
+    SwitchEntity
 )
 
 from bond import (
@@ -31,7 +31,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         add_entities([switch])
 
 
-class BondSwitch(SwitchDevice):
+class BondSwitch(SwitchEntity):
     """Representation of a Bond Generic Device."""
 
     def __init__(self, bond, deviceId, device, properties):
