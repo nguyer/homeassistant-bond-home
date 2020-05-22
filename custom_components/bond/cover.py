@@ -9,7 +9,7 @@ from homeassistant.components.cover import (
     SUPPORT_STOP,
     STATE_CLOSED,
     STATE_OPEN,
-    CoverDevice
+    CoverEntity
 )
 
 from bond import (
