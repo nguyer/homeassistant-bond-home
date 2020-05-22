@@ -141,8 +141,7 @@ class BondFireplace(LightEntity):
 
     @property
     def name(self):
-        """Return the display name of this 
-        ."""
+        """Return the display name of this."""
         return self._name
 
     @property
