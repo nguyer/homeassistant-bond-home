@@ -120,7 +120,7 @@ class BondLight(LightEntity):
         return self.unique_id
 
 
-class BondFireplace(Light):
+class BondFireplace(LightEntity):
     """Representation of an Bond Fireplace."""
 
     def __init__(self, bond, deviceId, device, properties, supportsFlame):
@@ -141,7 +141,8 @@ class BondFireplace(Light):
 
     @property
     def name(self):
-        """Return the display name of this light."""
+        """Return the display name of this 
+        ."""
         return self._name
 
     @property
