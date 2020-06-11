@@ -1,6 +1,7 @@
 """Bond Home Fan Integration"""
 from homeassistant.components.fan import (
     SUPPORT_SET_SPEED,
+    SUPPORT_DIRECTION,
     SPEED_OFF,
     SPEED_LOW,
     SPEED_MEDIUM,
@@ -8,10 +9,9 @@ from homeassistant.components.fan import (
     FanEntity
 )
 
-from bond import (
-    BOND_DEVICE_TYPE_CEILING_FAN,
-    BOND_DEVICE_ACTION_SET_SPEED
-)
+from bond import (DeviceTypes,
+                  Actions,
+                  Directions)
 
 import logging
 DOMAIN = 'bond'
@@ -25,7 +25,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     for deviceId in bond.getDeviceIds():
         device = bond.getDevice(deviceId)
-        if device['type'] != BOND_DEVICE_TYPE_CEILING_FAN:
+        if device['type'] != DeviceTypes.CEILING_FAN:
             continue
 
         deviceProperties = bond.getProperties(deviceId)
@@ -48,7 +48,7 @@ class BondFan(FanEntity):
         self._speed_name_by_value = {}
         self._attributes = {}
 
-        if BOND_DEVICE_ACTION_SET_SPEED in self._device['actions']:
+        if Actions.SET_SPEED in self._device['actions']:
             if 'max_speed' in self._properties:
                 self._speed_high = int(self._properties['max_speed'])
                 self._speed_low = int(1)
@@ -91,8 +91,11 @@ class BondFan(FanEntity):
         """Flag supported features."""
         supported_features = 0
 
-        if BOND_DEVICE_ACTION_SET_SPEED in self._device['actions']:
+        if Actions.SET_SPEED in self._device['actions']:
             supported_features |= SUPPORT_SET_SPEED
+
+        if Actions.SET_DIRECTION in self._device['actions']:
+            supported_features |= SUPPORT_DIRECTION
 
         return supported_features
 
@@ -117,6 +120,19 @@ class BondFan(FanEntity):
             self._bond.setSpeed(self._deviceId, self._speed_low)
         self._attributes['current_speed'] = speed
 
+    def set_direction(self, direction: str) -> None:
+        """Set the direction of the fan."""
+        if direction == "forward":
+            self._bond.setDirection(self._deviceId, Directions.FORWARD)
+        elif direction == "reverse":
+            self._bond.setDirection(self._deviceId, Directions.REVERSE)
+        self._attributes['current_direction'] = direction
+
+    @property
+    def current_direction(self):
+        """Return the current direction of the fan."""
+        return self._attributes.get("current_direction")
+
     @property
     def speed(self) -> str:
         """Return the current speed."""
@@ -133,6 +149,12 @@ class BondFan(FanEntity):
                 self._attributes['current_speed'] = self._speed_name_by_value[bondState['speed']]
             else:
                 self._attributes['current_speed'] = SPEED_OFF
+
+        if 'direction' in bondState:
+            if bondState['direction'] == Directions.REVERSE:
+                self._attributes['current_direction'] = "reverse"
+            else:
+                self._attributes['current_direction'] = "forward"
 
     @property
     def unique_id(self):

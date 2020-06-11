@@ -13,7 +13,7 @@ from homeassistant.components.cover import (
 )
 
 from bond import (
-    BOND_DEVICE_TYPE_MOTORIZED_SHADES
+    DeviceTypes
 )
 
 import logging
@@ -28,7 +28,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     for deviceId in bond.getDeviceIds():
         device = bond.getDevice(deviceId)
-        if device['type'] != BOND_DEVICE_TYPE_MOTORIZED_SHADES:
+        if device['type'] != DeviceTypes.MOTORIZED_SHADES:
             continue
 
         deviceProperties = bond.getProperties(deviceId)
