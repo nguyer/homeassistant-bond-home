@@ -1,0 +1,11 @@
+{
+    "name": "Bond Home",
+    "domains": [
+        "light",
+        "fan",
+        "switch",
+        "cover"
+    ],
+    "homeassistant": "0.110.0",
+    "render_readme": true
+}
