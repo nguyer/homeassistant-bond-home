@@ -7,5 +7,6 @@
         "cover"
     ],
     "homeassistant": "0.110.0",
-    "render_readme": true
+    "render_readme": true,
+     "iot_class": ["Assumed State", "Local Push"]
 }
