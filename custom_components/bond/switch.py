@@ -40,11 +40,7 @@ class BondSwitch(SwitchEntity):
         self._deviceId = deviceId
         self._device = device
         self._properties = properties
-        name = "Switch" if "name" not in properties else properties['name']
-        if "location" in properties:
-            self._name = f"{properties['location']} {name}"
-        else:
-            self._name = name
+        self._name = device['name']
         self._state = None
 
     @property
