@@ -18,6 +18,11 @@ DOMAIN = 'bond'
 
 _LOGGER = logging.getLogger(__name__)
 
+#4+ FAN SPEEDS
+SPEED_MEDIUM_LOW = "medium-low"
+SPEED_MEDIUM_HIGH = "medium-high"
+SPEED_MEDIUM_MEDIUM = "medium-medium"
+
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Bond Fan platform"""
@@ -51,15 +56,51 @@ class BondFan(FanEntity):
         if BOND_DEVICE_ACTION_SET_SPEED in self._device['actions']:
             if 'max_speed' in self._properties:
                 self._speed_high = int(self._properties['max_speed'])
+
                 self._speed_low = int(1)
                 self._speed_list.append(SPEED_LOW)
                 self._speed_name_by_value[self._speed_low] = SPEED_LOW
-                if self._speed_high > 2:
-                    self._speed_medium = (self._speed_high + 1) // 2
+	
+                if self._speed_high == 4:
+                    self._speed_medium_low = int(2)
+                    self._speed_list.append(SPEED_MEDIUM_LOW)
+                    self._speed_name_by_value[self._speed_medium_low] = SPEED_MEDIUM_LOW
+                    self._speed_medium = int(3)
                     self._speed_list.append(SPEED_MEDIUM)
                     self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM
+		
+                if self._speed_high == 5:
+                    self._speed_medium_low = int(2)
+                    self._speed_list.append(SPEED_MEDIUM_LOW)
+                    self._speed_name_by_value[self._speed_medium_low] = SPEED_MEDIUM_LOW
+                    self._speed_medium = int(3)
+                    self._speed_list.append(SPEED_MEDIUM)
+                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM
+                    self._speed_medium_high = int(4)
+                    self._speed_list.append(SPEED_MEDIUM_HIGH)
+                    self._speed_name_by_value[self._speed_medium_high] = SPEED_MEDIUM_HIGH
+	
+                if self._speed_high == 6:
+                    self._speed_medium_low = int(2)
+                    self._speed_list.append(SPEED_MEDIUM_LOW)
+                    self._speed_name_by_value[self._speed_medium_low] = SPEED_MEDIUM_LOW
+                    self._speed_medium_medium = int(3)
+                    self._speed_list.append(SPEED_MEDIUM_MEDIUM)
+                    self._speed_name_by_value[self._speed_medium_medium] = SPEED_MEDIUM_MEDIUM
+                    self._speed_medium = int(4)
+                    self._speed_list.append(SPEED_MEDIUM)
+                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM
+                    self._speed_medium_high = int(5)
+                    self._speed_list.append(SPEED_MEDIUM_HIGH)
+                    self._speed_name_by_value[self._speed_medium_high] = SPEED_MEDIUM_HIGH		
+                else:
+                    self._speed_medium = (self._speed_high + 1) // 2
+                    self._speed_list.append(SPEED_MEDIUM)
+                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM					
+
                 self._speed_list.append(SPEED_HIGH)
-                self._speed_name_by_value[self._speed_high] = SPEED_HIGH
+                self._speed_name_by_value[self._speed_high] = SPEED_HIGH					
+            
 
     @property
     def name(self):
@@ -115,6 +156,12 @@ class BondFan(FanEntity):
             self._bond.setSpeed(self._deviceId, self._speed_medium)
         elif speed == SPEED_LOW:
             self._bond.setSpeed(self._deviceId, self._speed_low)
+        elif speed == SPEED_MEDIUM_LOW:
+            self._bond.setSpeed(self._deviceId, self._speed_medium_low)
+        elif speed == SPEED_MEDIUM_HIGH:
+            self._bond.setSpeed(self._deviceId, self._speed_medium_high)
+        elif speed == SPEED_MEDIUM_MEDIUM:
+            self._bond.setSpeed(self._deviceId, self._speed_medium_medium)
         self._attributes['current_speed'] = speed
 
     @property
@@ -140,6 +187,6 @@ class BondFan(FanEntity):
         return self._deviceId
 
     @property
-    def device_id(self):
+    def device_id(self):	
         """Return the ID of this fan."""
         return self.unique_id
