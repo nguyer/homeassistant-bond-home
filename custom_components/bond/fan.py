@@ -60,47 +60,29 @@ class BondFan(FanEntity):
                 self._speed_low = int(1)
                 self._speed_list.append(SPEED_LOW)
                 self._speed_name_by_value[self._speed_low] = SPEED_LOW
+				
+                if self._speed_high > 3:
+                    self._speed_medium_low = int(2)
+                    self._speed_list.append(SPEED_MEDIUM_LOW)
+                    self._speed_name_by_value[self._speed_medium_low] = SPEED_MEDIUM_LOW
 	
-                if self._speed_high == 4:
-                    self._speed_medium_low = int(2)
-                    self._speed_list.append(SPEED_MEDIUM_LOW)
-                    self._speed_name_by_value[self._speed_medium_low] = SPEED_MEDIUM_LOW
-                    self._speed_medium = int(3)
-                    self._speed_list.append(SPEED_MEDIUM)
-                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM
-		
-                if self._speed_high == 5:
-                    self._speed_medium_low = int(2)
-                    self._speed_list.append(SPEED_MEDIUM_LOW)
-                    self._speed_name_by_value[self._speed_medium_low] = SPEED_MEDIUM_LOW
-                    self._speed_medium = int(3)
-                    self._speed_list.append(SPEED_MEDIUM)
-                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM
-                    self._speed_medium_high = int(4)
-                    self._speed_list.append(SPEED_MEDIUM_HIGH)
-                    self._speed_name_by_value[self._speed_medium_high] = SPEED_MEDIUM_HIGH
-	
-                if self._speed_high == 6:
-                    self._speed_medium_low = int(2)
-                    self._speed_list.append(SPEED_MEDIUM_LOW)
-                    self._speed_name_by_value[self._speed_medium_low] = SPEED_MEDIUM_LOW
-                    self._speed_medium_medium = int(3)
-                    self._speed_list.append(SPEED_MEDIUM_MEDIUM)
-                    self._speed_name_by_value[self._speed_medium_medium] = SPEED_MEDIUM_MEDIUM
-                    self._speed_medium = int(4)
-                    self._speed_list.append(SPEED_MEDIUM)
-                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM
-                    self._speed_medium_high = int(5)
-                    self._speed_list.append(SPEED_MEDIUM_HIGH)
-                    self._speed_name_by_value[self._speed_medium_high] = SPEED_MEDIUM_HIGH		
-                else:
+                if self._speed_high > 2:
                     self._speed_medium = (self._speed_high + 1) // 2
                     self._speed_list.append(SPEED_MEDIUM)
-                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM					
+                    self._speed_name_by_value[self._speed_medium] = SPEED_MEDIUM
+				
+                if self._speed_high > 5:
+                    self._speed_medium_medium = self._speed_medium + 1
+                    self._speed_list.append(SPEED_MEDIUM_MEDIUM)
+                    self._speed_name_by_value[self._speed_medium_medium] = SPEED_MEDIUM_MEDIUM
+					
+                if self._speed_high > 4:
+                    self._speed_medium_high = self._speed_high - 1
+                    self._speed_list.append(SPEED_MEDIUM_HIGH)
+                    self._speed_name_by_value[self._speed_medium_high] = SPEED_MEDIUM_HIGH
 
                 self._speed_list.append(SPEED_HIGH)
-                self._speed_name_by_value[self._speed_high] = SPEED_HIGH					
-            
+                self._speed_name_by_value[self._speed_high] = SPEED_HIGH     
 
     @property
     def name(self):
