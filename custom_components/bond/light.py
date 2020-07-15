@@ -7,17 +7,8 @@ from homeassistant.components.light import (
 )
 
 from bond import (
-    BOND_DEVICE_TYPE_CEILING_FAN,
-    BOND_DEVICE_TYPE_FIREPLACE,
-    BOND_DEVICE_ACTION_TURN_LIGHT_ON,
-    BOND_DEVICE_ACTION_TURN_LIGHT_OFF,
-    BOND_DEVICE_ACTION_TURN_ON,
-    BOND_DEVICE_ACTION_TURN_OFF,
-    BOND_DEVICE_ACTION_TOGGLE_LIGHT,
-    BOND_DEVICE_ACTION_TOGGLE_POWER,
-    BOND_DEVICE_ACTION_SET_FLAME,
-    BOND_DEVICE_ACTION_INCREASE_FLAME,
-    BOND_DEVICE_ACTION_DECREASE_FLAME
+    DeviceTypes,
+    Actions
 )
 
 import logging
@@ -37,29 +28,29 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         deviceType = device['type']
         actions = device['actions']
 
-        if deviceType == BOND_DEVICE_TYPE_CEILING_FAN:
+        if deviceType == DeviceTypes.CEILING_FAN:
             # If the device type is not Ceiling Fan, or it is
             # Ceiling Fan but has no action for light control
             # then don't create a light instance.
             supportsLightActions = \
-                BOND_DEVICE_ACTION_TURN_LIGHT_ON in actions or \
-                BOND_DEVICE_ACTION_TURN_LIGHT_OFF in actions or \
-                BOND_DEVICE_ACTION_TOGGLE_LIGHT in actions
+                Actions.TURN_LIGHT_ON in actions or \
+                Actions.TURN_LIGHT_OFF in actions or \
+                Actions.TOGGLE_LIGHT in actions
             if supportsLightActions:
                 deviceProperties = bond.getProperties(deviceId)
                 light = BondLight(bond, deviceId, device, deviceProperties)
                 add_entities([light])
 
-        elif deviceType == BOND_DEVICE_TYPE_FIREPLACE:
+        elif deviceType == DeviceTypes.FIREPLACE:
             supportsFlameActions = \
-                BOND_DEVICE_ACTION_SET_FLAME in actions or \
-                BOND_DEVICE_ACTION_INCREASE_FLAME in actions or \
-                BOND_DEVICE_ACTION_DECREASE_FLAME in actions
+                Actions.SET_FLAME in actions or \
+                Actions.INCREASE_FLAME in actions or \
+                Actions.DECREASE_FLAME in actions
 
             supportsGenericActions = \
-                BOND_DEVICE_ACTION_TURN_ON in actions or \
-                BOND_DEVICE_ACTION_TURN_OFF in actions or \
-                BOND_DEVICE_ACTION_TOGGLE_POWER in actions
+                Actions.TURN_ON in actions or \
+                Actions.TURN_OFF in actions or \
+                Actions.TOGGLE_POWER in actions
 
             if supportsGenericActions:
                 deviceProperties = bond.getProperties(deviceId)

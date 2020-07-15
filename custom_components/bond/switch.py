@@ -8,7 +8,7 @@ from homeassistant.components.switch import (
 )
 
 from bond import (
-    BOND_DEVICE_TYPE_GENERIC_DEVICE
+    DeviceTypes
 )
 
 import logging
@@ -23,7 +23,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     for deviceId in bond.getDeviceIds():
         device = bond.getDevice(deviceId)
-        if device['type'] != BOND_DEVICE_TYPE_GENERIC_DEVICE:
+        if device['type'] != DeviceTypes.GENERIC_DEVICE:
             continue
 
         deviceProperties = bond.getProperties(deviceId)
