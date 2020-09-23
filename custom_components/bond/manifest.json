@@ -4,5 +4,6 @@
   "documentation": "https://github.com/nguyer/homeassistant-bond-home",
   "dependencies": [],
   "codeowners": [],
-  "requirements": ["bond-home==0.0.9"]
+  "requirements": ["bond-home==0.0.9"],
+  "issue_tracker": "https://github.com/nguyer/homeassistant-bond-home/issues"
 }
