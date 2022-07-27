@@ -1,3 +1,6 @@
+# DEPRECATED
+There is now an official Bond integration for Home Assistant, so we recommend you use that instead. Details can be found here: [https://www.home-assistant.io/integrations/bond/](https://www.home-assistant.io/integrations/bond/). This repo is no longer maintained.
+
 # Bond Home Integration for Home Assistant
 
 Uses the [bond-home Python library](https://github.com/nguyer/bond-home) (note, still very much a work in progress. PRs welcome :)
